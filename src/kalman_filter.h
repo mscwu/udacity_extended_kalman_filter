@@ -1,6 +1,9 @@
 #ifndef KALMAN_FILTER_H_
 #define KALMAN_FILTER_H_
 #include "Eigen/Dense"
+using namespace std;
+
+//#define PI 3.14159265
 
 class KalmanFilter {
 public:
