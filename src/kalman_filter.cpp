@@ -35,10 +35,11 @@ void KalmanFilter::Update(const VectorXd &z) {
   long x_size = x_.size();
   MatrixXd I = MatrixXd::Identity(x_size, x_size);
   VectorXd y = z - H_ * x_;
-  MatrixXd S = H_ * P_* H_.transpose() + R_;
-  MatrixXd K = P_ * H_.transpose() * S.inverse();
-  x_ = x_ + K * y;
-  P_ = (I - K * H_) * P_;
+  UpdateCommon(y);
+  //MatrixXd S = H_ * P_* H_.transpose() + R_;
+  //MatrixXd K = P_ * H_.transpose() * S.inverse();
+  //x_ = x_ + K * y;
+  //P_ -= K * H_ * P_;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -67,9 +68,20 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     // normalize angle
     while (y[1]> M_PI) y[1] -= 2 * M_PI;
     while (y[1]<-M_PI) y[1] += 2 * M_PI;
-    MatrixXd S = H_ * P_* H_.transpose() + R_;
-    MatrixXd K = P_ * H_.transpose() * S.inverse();
-    x_ = x_ + K * y;
-    P_ = (I - K * H_) * P_;
+    //NormalizeAngle(y[1]);
+    UpdateCommon(y);
+    //MatrixXd S = H_ * P_* H_.transpose() + R_;
+    //MatrixXd K = P_ * H_.transpose() * S.inverse();
+    //x_ = x_ + K * y;
+    //P_ = (I - K * H_) * P_;
   }
+}
+
+void KalmanFilter::UpdateCommon(const VectorXd &y) {
+  const MatrixXd PHt = P_ * H_.transpose();
+  const MatrixXd S = H_ * PHt + R_;
+  const MatrixXd K = PHt * S.inverse();
+
+  x_ += K * y;
+  P_ -= K * H_ * P_;
 }

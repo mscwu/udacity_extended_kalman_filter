@@ -22,8 +22,9 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
       residual = residual.array() * residual.array();
       rmse += residual;
     }
-    rmse = rmse.array().sqrt();
+
     rmse = rmse.array() / estimations.size();
+    rmse = rmse.array().sqrt();    
   }
   return rmse;
 }
@@ -53,7 +54,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
       Hj(1,0) = -py / square;
       Hj(1,1) = px / square;
       Hj(2,0) = py * (vx * py - vy * px) / pow(square, 1.5);
-      Hj(2,1) = px * (vx * py - vy * px) / pow(square, 1.5);
+      Hj(2,1) = px * (px * vy - py * vx) / pow(square, 1.5);
       Hj(2,2) = Hj(0,0);
       Hj(2,3) = Hj(0,1);
   }
